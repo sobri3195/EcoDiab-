@@ -9,11 +9,11 @@ export default function Navbar() {
           <BrandLogo size="sm" />
         </Link>
         <div className="hidden gap-5 text-sm text-slate-600 md:flex dark:text-slate-300">
-          <a href="#features">Features</a>
-          <a href="#impact">Impact</a>
-          <a href="#steps">How it works</a>
+          <a href="#features" className="hover:text-emerald-600">Fitur</a>
+          <a href="#impact" className="hover:text-emerald-600">Dampak</a>
+          <a href="#steps" className="hover:text-emerald-600">Cara Kerja</a>
         </div>
-        <Link to="/dashboard" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+        <Link to="/dashboard" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
           Open Demo
         </Link>
       </nav>
