@@ -6,8 +6,33 @@
   @apply border-slate-200;
 }
 
+:root {
+  --text-scale: 1;
+}
+
+:root[data-text-scale='large'] {
+  --text-scale: 1.08;
+}
+
+html {
+  font-size: calc(16px * var(--text-scale));
+}
+
 body {
   @apply text-slate-800 dark:text-slate-100;
+}
+
+p {
+  @apply leading-relaxed;
+}
+
+.high-contrast body {
+  @apply bg-white text-black dark:bg-black dark:text-white;
+}
+
+.high-contrast a,
+.high-contrast button {
+  @apply outline outline-2 outline-offset-2 outline-slate-500;
 }
 
 @media print {
