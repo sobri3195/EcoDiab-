@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   Sprout,
   Stethoscope,
+  TimerReset,
+  Users,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MarketingLayout from '../layouts/MarketingLayout';
@@ -48,6 +50,12 @@ const steps = [
     title: 'Intervensi Tepat & Hijau',
     description: 'Follow-up diprioritaskan untuk pasien kritis sambil mengurangi kunjungan dan dokumen yang tidak perlu.',
   },
+];
+
+const highlights = [
+  { icon: Users, label: 'Tenaga kesehatan aktif', value: '120+' },
+  { icon: TimerReset, label: 'Waktu triase lebih cepat', value: '-42%' },
+  { icon: HeartPulse, label: 'Kontrol pasien tepat waktu', value: '89%' },
 ];
 
 export default function LandingPage() {
@@ -131,6 +139,22 @@ export default function LandingPage() {
             </div>
           </aside>
         </div>
+
+        <div className="mx-auto max-w-6xl px-4 pb-8">
+          <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white/80 p-5 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 md:grid-cols-3">
+            {highlights.map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+                <div className="rounded-lg bg-emerald-100 p-2 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold">{value}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section id="features" className="mx-auto max-w-6xl px-4 py-6 md:py-10">
@@ -179,7 +203,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="steps" className="mx-auto max-w-6xl px-4 pb-16 pt-6">
+      <section id="steps" className="mx-auto max-w-6xl px-4 pb-10 pt-6">
         <h2 className="text-2xl font-bold md:text-3xl">How it works</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {steps.map(({ icon: Icon, title, description }, idx) => (
@@ -192,6 +216,51 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-12">
+        <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-500 to-teal-500 p-6 text-white shadow-lg md:flex md:items-center md:justify-between">
+          <div>
+            <h3 className="text-2xl font-bold">Siap optimalkan layanan diabetes Anda?</h3>
+            <p className="mt-2 max-w-2xl text-emerald-50">Mulai dari dashboard demo untuk melihat bagaimana AI triase dan green monitoring bekerja secara nyata.</p>
+          </div>
+          <Link
+            to="/dashboard"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-emerald-700 transition hover:bg-emerald-50 md:mt-0"
+          >
+            Coba Demo Sekarang <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 bg-white/80 dark:border-slate-700 dark:bg-slate-950/70">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-4">
+          <div className="md:col-span-2">
+            <h4 className="text-lg font-bold text-emerald-700 dark:text-emerald-400">EcoDiab</h4>
+            <p className="mt-2 max-w-md text-sm text-slate-600 dark:text-slate-300">
+              Platform analitik klinis dan keberlanjutan untuk meningkatkan kualitas perawatan diabetes, sekaligus menurunkan dampak lingkungan layanan kesehatan.
+            </p>
+          </div>
+          <div>
+            <h5 className="font-semibold">Navigasi</h5>
+            <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <li><a href="#features" className="hover:text-emerald-600">Fitur</a></li>
+              <li><a href="#impact" className="hover:text-emerald-600">Dampak</a></li>
+              <li><a href="#steps" className="hover:text-emerald-600">Alur</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-semibold">Kontak</h5>
+            <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <li>Email: care@ecodiab.health</li>
+              <li>Phone: +62 21 5550 1234</li>
+              <li>Jakarta, Indonesia</li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-slate-200 py-4 text-center text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+          © {new Date().getFullYear()} EcoDiab. Better care, greener healthcare.
+        </div>
+      </footer>
     </MarketingLayout>
   );
 }
