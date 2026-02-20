@@ -7,7 +7,7 @@ export function recommendFollowUp(
 ): FollowUpType {
   if (tier === 'Critical' || trend === 'worsening') return 'Monthly In-person';
   if (tier === 'High' && adherence < 65) return 'Monthly In-person';
-  if (tier === 'Low' && adherence >= 80 && trend !== 'worsening') return 'Remote Monitoring';
+  if (tier === 'Low' && adherence >= 80) return 'Remote Monitoring';
   return 'Telemedicine';
 }
 
