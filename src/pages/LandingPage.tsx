@@ -1,5 +1,6 @@
 import { ArrowRight, Brain, CalendarClock, Leaf } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import BrandLogo from '../components/BrandLogo';
 import MarketingLayout from '../layouts/MarketingLayout';
 import { useAppContext } from '../lib/app-context';
 
@@ -12,6 +13,9 @@ export default function LandingPage() {
   return (
     <MarketingLayout>
       <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="mb-5">
+          <BrandLogo size="lg" showText={false} />
+        </div>
         <h1 className="text-4xl font-bold md:text-5xl">EcoDiab — Sustainable AI Diabetes Care</h1>
         <p className="mt-5 max-w-3xl text-lg text-slate-600 dark:text-slate-300">
           Paperless ecosystem, early risk prediction, optimized follow-up, and low-carbon care for developing countries.
