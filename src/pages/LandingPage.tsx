@@ -1,8 +1,55 @@
-import { ArrowRight, Brain, CalendarClock, Leaf } from 'lucide-react';
+import {
+  ArrowRight,
+  Brain,
+  CalendarClock,
+  CheckCircle2,
+  HeartPulse,
+  Leaf,
+  ShieldCheck,
+  Sprout,
+  Stethoscope,
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import BrandLogo from '../components/BrandLogo';
 import MarketingLayout from '../layouts/MarketingLayout';
 import { useAppContext } from '../lib/app-context';
+
+const features = [
+  {
+    icon: Brain,
+    title: 'AI Risk Engine',
+    description:
+      'Model prediktif untuk identifikasi dini pasien dengan risiko komplikasi tinggi, agar intervensi dilakukan lebih cepat.',
+  },
+  {
+    icon: CalendarClock,
+    title: 'Smart Follow-Up Optimizer',
+    description: 'Penjadwalan tindak lanjut otomatis berdasarkan tingkat risiko, kepatuhan, dan prioritas klinis.',
+  },
+  {
+    icon: Leaf,
+    title: 'Green Monitoring',
+    description: 'Pemantauan pengurangan jejak karbon layanan kesehatan melalui proses paperless dan kunjungan yang lebih efisien.',
+  },
+];
+
+const steps = [
+  {
+    icon: Stethoscope,
+    title: 'Input Data Klinis',
+    description: 'Tim kesehatan memasukkan indikator penting pasien ke dalam dashboard terpadu.',
+  },
+  {
+    icon: Brain,
+    title: 'Analisis Risiko AI',
+    description: 'Sistem mengelompokkan pasien berdasarkan level risiko dan memberi rekomendasi tindak lanjut.',
+  },
+  {
+    icon: Sprout,
+    title: 'Intervensi Tepat & Hijau',
+    description: 'Follow-up diprioritaskan untuk pasien kritis sambil mengurangi kunjungan dan dokumen yang tidak perlu.',
+  },
+];
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -37,10 +84,18 @@ export default function LandingPage() {
         )}
       </section>
 
-      <section id="features" className="mx-auto grid max-w-6xl gap-4 px-4 pb-14 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900"><Brain className="mb-2" />AI Risk Engine</div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900"><CalendarClock className="mb-2" />Smart Follow-Up Optimizer</div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900"><Leaf className="mb-2" />Green Monitoring</div>
+      <section id="steps" className="mx-auto max-w-6xl px-4 pb-16 pt-6">
+        <h2 className="text-2xl font-bold md:text-3xl">How it works</h2>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {steps.map(({ icon: Icon, title, description }, idx) => (
+            <article key={title} className="relative rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+              <span className="absolute right-4 top-4 text-xs font-bold text-slate-400">0{idx + 1}</span>
+              <Icon className="h-6 w-6 text-emerald-600" />
+              <h3 className="mt-3 font-semibold">{title}</h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{description}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </MarketingLayout>
   );
