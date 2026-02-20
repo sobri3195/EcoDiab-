@@ -1,5 +1,6 @@
 import { Activity, BarChart3, CalendarCheck2, Leaf, Salad, ShieldAlert, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import BrandLogo from './BrandLogo';
 
 type SidebarProps = {
   role: 'Clinician' | 'Admin';
@@ -27,6 +28,9 @@ const navGroups = [
 export default function Sidebar({ role }: SidebarProps) {
   return (
     <aside className="w-full border-r border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900 md:w-72">
+      <div className="mb-4">
+        <BrandLogo size="sm" />
+      </div>
       <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-500">Navigation</h2>
       <div className="space-y-4">
         {navGroups.map((group) => (
