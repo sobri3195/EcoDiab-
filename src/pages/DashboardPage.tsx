@@ -2,9 +2,12 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import Card from '../components/Card';
+import { EmptyState, ErrorState, LoadingState } from '../components/PageState';
 import Table from '../components/Table';
-import { alerts, dashboardMetrics, monthlyPaperReduction, monthlyVisitReduction, riskDistribution } from '../lib/mock';
+import { useToast } from '../components/Toast';
+import { api, type DashboardPayload } from '../lib/api';
 import { dictionary, useAppContext } from '../lib/app-context';
+import { logError, logEvent } from '../lib/logger';
 
 const severityClass: Record<string, string> = {
   Low: 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-200',

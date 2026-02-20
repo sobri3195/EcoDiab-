@@ -1,8 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { onApiError, type PatientPayload, type RiskPredictionResponse } from './api';
 
 export type Lang = 'EN' | 'ID';
 export type Role = 'Clinician' | 'Admin';
 export type TextScale = 'normal' | 'large';
+
+type Notification = { id: number; message: string; type: 'success' | 'error' | 'info' };
 
 type AppContextValue = {
   lang: Lang;
@@ -21,11 +24,11 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export const dictionary = {
   EN: {
-    demoLabel: 'Demo only (deterministic mock data)',
+    demoLabel: 'Live data mode',
     welcome: 'Welcome back',
   },
   ID: {
-    demoLabel: 'Hanya demo (data mock deterministik)',
+    demoLabel: 'Mode data realtime',
     welcome: 'Selamat datang kembali',
   },
 };
