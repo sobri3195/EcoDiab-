@@ -3,6 +3,7 @@ import { onApiError, type PatientPayload, type RiskPredictionResponse } from './
 
 export type Lang = 'EN' | 'ID';
 export type Role = 'Clinician' | 'Admin';
+export type TextScale = 'normal' | 'large';
 
 type Notification = { id: number; message: string; type: 'success' | 'error' | 'info' };
 
@@ -10,19 +11,13 @@ type AppContextValue = {
   lang: Lang;
   role: Role;
   darkMode: boolean;
-  token: string | null;
-  isAuthenticated: boolean;
-  patients: PatientPayload[];
-  latestRisk: RiskPredictionResponse | null;
-  notifications: Notification[];
+  highContrast: boolean;
+  textScale: TextScale;
   setLang: (lang: Lang) => void;
   setRole: (role: Role) => void;
+  setTextScale: (scale: TextScale) => void;
   toggleDarkMode: () => void;
-  login: (token: string) => void;
-  logout: (reason?: string) => void;
-  setPatients: (patients: PatientPayload[]) => void;
-  setLatestRisk: (risk: RiskPredictionResponse | null) => void;
-  pushNotification: (message: string, type?: Notification['type']) => void;
+  toggleHighContrast: () => void;
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -42,30 +37,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>('EN');
   const [role, setRole] = useState<Role>('Clinician');
   const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('ecodiab-theme') === 'dark');
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('ecodiab-token'));
-  const [patients, setPatients] = useState<PatientPayload[]>([]);
-  const [latestRisk, setLatestRisk] = useState<RiskPredictionResponse | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  const pushNotification = (message: string, type: Notification['type'] = 'info') => {
-    const id = Date.now() + Math.floor(Math.random() * 1000);
-    setNotifications((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setNotifications((prev) => prev.filter((item) => item.id !== id)), 3200);
-  };
-
-  const logout = (reason?: string) => {
-    localStorage.removeItem('ecodiab-token');
-    localStorage.removeItem('ecodiab-token-expiry');
-    setToken(null);
-    if (reason) { pushNotification(reason, 'error'); window.alert(reason); }
-  };
-
-  const login = (newToken: string) => {
-    setToken(newToken);
-    localStorage.setItem('ecodiab-token', newToken);
-    localStorage.setItem('ecodiab-token-expiry', String(Date.now() + 1000 * 60 * 60));
-    pushNotification('Berhasil login.', 'success');
-  };
+  const [highContrast, setHighContrast] = useState<boolean>(() => localStorage.getItem('ecodiab-contrast') === 'high');
+  const [textScale, setTextScale] = useState<TextScale>(() => (localStorage.getItem('ecodiab-text-scale') === 'large' ? 'large' : 'normal'));
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -73,43 +46,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [darkMode]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const expiry = Number(localStorage.getItem('ecodiab-token-expiry') ?? '0');
-      if (token && expiry && Date.now() > expiry) {
-        logout('Sesi Anda berakhir. Silakan login kembali.');
-      }
-    }, 20000);
-
-    return () => clearInterval(interval);
-  }, [token]);
+    document.documentElement.classList.toggle('high-contrast', highContrast);
+    localStorage.setItem('ecodiab-contrast', highContrast ? 'high' : 'normal');
+  }, [highContrast]);
 
   useEffect(() => {
-    const remove = onApiError((error) => {
-      if (error.status === 401) logout('Token kadaluarsa. Anda telah logout otomatis.');
-    });
-    return remove;
-  }, []);
+    document.documentElement.dataset.textScale = textScale;
+    localStorage.setItem('ecodiab-text-scale', textScale);
+  }, [textScale]);
 
   const value = useMemo(
     () => ({
       lang,
       role,
       darkMode,
-      token,
-      isAuthenticated: Boolean(token),
-      patients,
-      latestRisk,
-      notifications,
+      highContrast,
+      textScale,
       setLang,
       setRole,
+      setTextScale,
       toggleDarkMode: () => setDarkMode((prev) => !prev),
-      login,
-      logout,
-      setPatients,
-      setLatestRisk,
-      pushNotification,
+      toggleHighContrast: () => setHighContrast((prev) => !prev),
     }),
-    [lang, role, darkMode, token, patients, latestRisk, notifications]
+    [lang, role, darkMode, highContrast, textScale]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
