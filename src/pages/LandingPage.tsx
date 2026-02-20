@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import BrandLogo from '../components/BrandLogo';
 import MarketingLayout from '../layouts/MarketingLayout';
 import { useAppContext } from '../lib/app-context';
 
@@ -201,6 +202,25 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
+        <h1 className="text-4xl font-bold md:text-5xl">EcoDiab — Sustainable AI Diabetes Care</h1>
+        <p className="mt-5 max-w-3xl text-lg text-slate-600 dark:text-slate-300">
+          Paperless ecosystem, early risk prediction, optimized follow-up, and low-carbon care for developing countries.
+        </p>
+        {isAuthenticated ? (
+          <Link to="/dashboard" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700">
+            Lanjut ke Dashboard <ArrowRight className="h-4 w-4" />
+          </Link>
+        ) : (
+          <button
+            onClick={() => {
+              login('demo-session-token');
+              navigate(redirectTo);
+            }}
+            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700"
+          >
+            Login & Open Demo <ArrowRight className="h-4 w-4" />
+          </button>
+        )}
       </section>
 
       <section id="steps" className="mx-auto max-w-6xl px-4 pb-10 pt-6">
