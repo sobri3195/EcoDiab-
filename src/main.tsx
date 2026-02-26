@@ -8,6 +8,14 @@ import { AlertCenterProvider } from './lib/alert-center-context';
 import { I18nProvider } from './lib/i18n';
 import './styles.css';
 
+initializeOfflineSync();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js');
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>

@@ -1,0 +1,16 @@
+{
+  "name": "EcoDiab",
+  "short_name": "EcoDiab",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#059669",
+  "description": "Platform manajemen diabetes dengan dukungan offline-first.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

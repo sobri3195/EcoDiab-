@@ -3,7 +3,7 @@ import Card from '../components/Card';
 import Drawer from '../components/Drawer';
 import { EmptyState, ErrorState, LoadingState } from '../components/PageState';
 import { useToast } from '../components/Toast';
-import { api, type FollowUpStatus, type FollowUpTask } from '../lib/api';
+import { MutationQueuedError, api, type FollowUpStatus, type FollowUpTask } from '../lib/api';
 import { logError, logEvent } from '../lib/logger';
 
 type DragState = {
@@ -87,6 +87,10 @@ export default function FollowUpPage() {
       pushToast(`Status follow-up ${task.patientName} dipindahkan ke ${STATUS_META[targetStatus].title}.`);
       logEvent('followup_status_changed', { taskId: task.id, from: task.status, to: targetStatus });
     } catch (err) {
+      if (err instanceof MutationQueuedError) {
+        pushToast(`Offline: perubahan status ${task.patientName} masuk antrean sinkronisasi.`);
+        return;
+      }
       setTasks(previousTasks);
       if (activeTask?.id === task.id) {
         const previousTask = previousTasks.find((item) => item.id === task.id) ?? null;
@@ -118,6 +122,10 @@ export default function FollowUpPage() {
               setTasks(generated);
               pushToast('Jadwal follow-up otomatis dibuat.');
             } catch (err) {
+              if (err instanceof MutationQueuedError) {
+                pushToast('Offline: permintaan generate follow-up masuk antrean sinkronisasi.');
+                return;
+              }
               pushToast('Gagal generate follow-up.');
               logError('followup_generate', err);
             }
