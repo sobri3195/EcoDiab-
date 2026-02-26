@@ -1,11 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { onApiError, type PatientPayload, type RiskPredictionResponse } from './api';
+import type { PatientPayload, RiskPredictionResponse } from './api';
 
 export type Lang = 'EN' | 'ID';
 export type Role = 'Clinician' | 'Admin';
 export type TextScale = 'normal' | 'large';
-
-type Notification = { id: number; message: string; type: 'success' | 'error' | 'info' };
 
 type AppContextValue = {
   lang: Lang;
@@ -13,9 +11,16 @@ type AppContextValue = {
   darkMode: boolean;
   highContrast: boolean;
   textScale: TextScale;
+  isAuthenticated: boolean;
+  patients: PatientPayload[];
+  latestRisk: RiskPredictionResponse | null;
   setLang: (lang: Lang) => void;
   setRole: (role: Role) => void;
   setTextScale: (scale: TextScale) => void;
+  setPatients: (patients: PatientPayload[]) => void;
+  setLatestRisk: (risk: RiskPredictionResponse | null) => void;
+  login: (token: string) => void;
+  logout: () => void;
   toggleDarkMode: () => void;
   toggleHighContrast: () => void;
 };
@@ -39,6 +44,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('ecodiab-theme') === 'dark');
   const [highContrast, setHighContrast] = useState<boolean>(() => localStorage.getItem('ecodiab-contrast') === 'high');
   const [textScale, setTextScale] = useState<TextScale>(() => (localStorage.getItem('ecodiab-text-scale') === 'large' ? 'large' : 'normal'));
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => Boolean(localStorage.getItem('ecodiab-token')));
+  const [patients, setPatients] = useState<PatientPayload[]>([]);
+  const [latestRisk, setLatestRisk] = useState<RiskPredictionResponse | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -62,13 +70,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       darkMode,
       highContrast,
       textScale,
+      isAuthenticated,
+      patients,
+      latestRisk,
       setLang,
       setRole,
       setTextScale,
+      setPatients,
+      setLatestRisk,
+      login: (token: string) => {
+        localStorage.setItem('ecodiab-token', token);
+        setIsAuthenticated(true);
+      },
+      logout: () => {
+        localStorage.removeItem('ecodiab-token');
+        setIsAuthenticated(false);
+      },
       toggleDarkMode: () => setDarkMode((prev) => !prev),
       toggleHighContrast: () => setHighContrast((prev) => !prev),
     }),
-    [lang, role, darkMode, highContrast, textScale]
+    [lang, role, darkMode, highContrast, textScale, isAuthenticated, patients, latestRisk]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
