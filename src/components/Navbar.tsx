@@ -13,7 +13,7 @@ export default function Navbar() {
           <a href="#impact" className="hover:text-emerald-600">Dampak</a>
           <a href="#steps" className="hover:text-emerald-600">Cara Kerja</a>
         </div>
-        <Link to="/dashboard" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
+        <Link to="/dashboard" className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 sm:px-4 sm:text-sm">
           Open Demo
         </Link>
       </nav>
