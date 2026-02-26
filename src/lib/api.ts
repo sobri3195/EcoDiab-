@@ -116,6 +116,8 @@ export type FollowUpTask = {
   status: 'pending' | 'completed' | 'overdue';
 };
 
+export type FollowUpStatus = FollowUpTask['status'];
+
 export const api = {
   get: <T>(path: string) => request<T>(path, 'GET'),
   post: <T>(path: string, body?: unknown) => request<T>(path, 'POST', body),
@@ -136,5 +138,14 @@ export const api = {
   completeFollowUp: (id: string) => request<FollowUpTask>(`/follow-ups/${id}/complete`, 'PATCH'),
   postponeFollowUp: (id: string) => request<FollowUpTask>(`/follow-ups/${id}/postpone`, 'PATCH'),
   rescheduleFollowUp: (id: string, dueDate: string) => request<FollowUpTask>(`/follow-ups/${id}/reschedule`, 'PATCH', { dueDate }),
+  updateFollowUpStatus: async (id: string, status: FollowUpStatus, dueDate?: string) => {
+    try {
+      return await request<FollowUpTask>(`/follow-ups/${id}/status`, 'PATCH', { status, dueDate });
+    } catch (error) {
+      if (status === 'completed') return api.completeFollowUp(id);
+      if (status === 'overdue') return api.postponeFollowUp(id);
+      return api.rescheduleFollowUp(id, dueDate ?? new Date().toISOString().slice(0, 10));
+    }
+  },
   getDietaryRecommendation: (payload: Record<string, unknown>) => request<{ summary: string; recommendations: string[] }>('/dietary/recommendations', 'POST', payload),
 };
