@@ -13,6 +13,8 @@ const pageLabel: Record<string, string> = {
   green: 'Green Report',
   'dietary-assistant': 'Dietary Assistant',
   alerts: 'Smart Alerts',
+  education: 'Patient Education',
+  achievements: 'Achievements',
 };
 
 export default function AppShell({ children }: { children: ReactNode }) {

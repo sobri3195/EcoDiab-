@@ -1,4 +1,4 @@
-import { Activity, BarChart3, BellRing, CalendarCheck2, Leaf, Salad, ShieldAlert, Users } from 'lucide-react';
+import { Activity, BarChart3, BellRing, BookOpenCheck, CalendarCheck2, Leaf, Salad, ShieldAlert, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import BrandLogo from './BrandLogo';
 
@@ -15,6 +15,7 @@ const navGroups = [
       { to: '/ai-risk', icon: ShieldAlert, label: 'AI Risk' },
       { to: '/follow-up', icon: CalendarCheck2, label: 'Follow-up' },
       { to: '/alerts', icon: BellRing, label: 'Smart Alerts' },
+      { to: '/education', icon: BookOpenCheck, label: 'Patient Education' },
     ],
   },
   {
