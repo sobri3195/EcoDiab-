@@ -4,6 +4,8 @@ import BrandLogo from './BrandLogo';
 
 type SidebarProps = {
   role: 'Clinician' | 'Admin';
+  className?: string;
+  onNavigate?: () => void;
 };
 
 const navGroups = [
@@ -26,9 +28,9 @@ const navGroups = [
   },
 ];
 
-export default function Sidebar({ role }: SidebarProps) {
+export default function Sidebar({ role, className = '', onNavigate }: SidebarProps) {
   return (
-    <aside className="w-full border-r border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900 md:w-72">
+    <aside className={`w-full border-r border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900 md:w-72 ${className}`}>
       <div className="mb-4">
         <BrandLogo size="sm" />
       </div>
@@ -42,6 +44,7 @@ export default function Sidebar({ role }: SidebarProps) {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  onClick={onNavigate}
                   className={({ isActive }) =>
                     `group flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${isActive ? 'border-emerald-200 bg-emerald-50 text-emerald-800 shadow-sm dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-800'}`
                   }
