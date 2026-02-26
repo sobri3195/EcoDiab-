@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Drawer from '../components/Drawer';
+import PatientProgressTimeline from '../components/PatientProgressTimeline';
 import { EmptyState, ErrorState, LoadingState } from '../components/PageState';
 import Table from '../components/Table';
 import { useToast } from '../components/Toast';
@@ -109,6 +110,8 @@ export default function PatientsPage() {
           {editing ? <button onClick={() => { setEditing(null); setForm(initialForm); }} className="rounded border px-3 py-2 text-xs">Batal</button> : null}
         </div>
       </div>
+
+      <PatientProgressTimeline patients={patients} loading={loading} error={error} onRetry={() => void loadPatients()} />
 
       {loading ? <LoadingState label="Memuat data pasien..." /> : null}
       {error ? <ErrorState message={error} onRetry={() => void loadPatients()} /> : null}
