@@ -4,7 +4,7 @@ import PatientProgressTimeline from '../components/PatientProgressTimeline';
 import { EmptyState, ErrorState, LoadingState } from '../components/PageState';
 import Table from '../components/Table';
 import { useToast } from '../components/Toast';
-import { api, type PatientPayload } from '../lib/api';
+import { MutationQueuedError, api, type PatientPayload } from '../lib/api';
 import { useAppContext } from '../lib/app-context';
 import { logError, logEvent } from '../lib/logger';
 
@@ -73,6 +73,17 @@ export default function PatientsPage() {
       setForm(initialForm);
       setEditing(null);
     } catch (err) {
+      if (err instanceof MutationQueuedError) {
+        if (editing) {
+          setPatients(patients.map((item) => (item.id === editing.id ? { ...item, ...payload } : item)));
+          pushToast('Offline: perubahan pasien masuk antrean sinkronisasi.');
+        } else {
+          const offlineDraft: PatientPayload = { id: `offline-${Date.now()}`, ...payload };
+          setPatients([offlineDraft, ...patients]);
+          pushToast('Offline: pasien baru disimpan lokal dan masuk antrean sinkronisasi.');
+        }
+        return;
+      }
       pushToast('Gagal menyimpan data pasien.');
       logError('patient_save', err);
     }
@@ -85,6 +96,11 @@ export default function PatientsPage() {
       pushToast('Pasien berhasil dihapus.');
       logEvent('patient_delete', { id });
     } catch (err) {
+      if (err instanceof MutationQueuedError) {
+        setPatients(patients.filter((item) => item.id !== id));
+        pushToast('Offline: penghapusan masuk antrean sinkronisasi.');
+        return;
+      }
       pushToast('Gagal menghapus pasien.');
       logError('patient_delete', err);
     }

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Card from '../components/Card';
 import { EmptyState, ErrorState, LoadingState } from '../components/PageState';
 import { useToast } from '../components/Toast';
-import { api, type PatientPayload, type RiskPredictionResponse } from '../lib/api';
+import { MutationQueuedError, api, type PatientPayload, type RiskPredictionResponse } from '../lib/api';
 import { useAppContext } from '../lib/app-context';
 import { logError, logEvent } from '../lib/logger';
 
@@ -66,6 +66,10 @@ export default function AIRiskPage() {
       pushToast('Risk score berhasil dihitung dan disimpan.');
       logEvent('risk_prediction_submit', { patientId: input.patientId, category: prediction.category });
     } catch (err) {
+      if (err instanceof MutationQueuedError) {
+        pushToast('Offline: permintaan prediksi disimpan ke antrean sinkronisasi.');
+        return;
+      }
       setError('Gagal memproses prediksi risiko.');
       logError('risk_prediction', err);
     } finally {
