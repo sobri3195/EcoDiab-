@@ -12,6 +12,7 @@ type AppContextValue = {
   highContrast: boolean;
   textScale: TextScale;
   isAuthenticated: boolean;
+  currentUserId: string;
   patients: PatientPayload[];
   latestRisk: RiskPredictionResponse | null;
   setLang: (lang: Lang) => void;
@@ -45,6 +46,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [highContrast, setHighContrast] = useState<boolean>(() => localStorage.getItem('ecodiab-contrast') === 'high');
   const [textScale, setTextScale] = useState<TextScale>(() => (localStorage.getItem('ecodiab-text-scale') === 'large' ? 'large' : 'normal'));
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => Boolean(localStorage.getItem('ecodiab-token')));
+  const [sessionToken, setSessionToken] = useState<string>(() => localStorage.getItem('ecodiab-token') ?? 'guest');
   const [patients, setPatients] = useState<PatientPayload[]>([]);
   const [latestRisk, setLatestRisk] = useState<RiskPredictionResponse | null>(null);
 
@@ -71,6 +73,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       highContrast,
       textScale,
       isAuthenticated,
+      currentUserId: sessionToken,
       patients,
       latestRisk,
       setLang,
@@ -80,16 +83,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setLatestRisk,
       login: (token: string) => {
         localStorage.setItem('ecodiab-token', token);
+        setSessionToken(token);
         setIsAuthenticated(true);
       },
       logout: () => {
         localStorage.removeItem('ecodiab-token');
+        setSessionToken('guest');
         setIsAuthenticated(false);
       },
       toggleDarkMode: () => setDarkMode((prev) => !prev),
       toggleHighContrast: () => setHighContrast((prev) => !prev),
     }),
-    [lang, role, darkMode, highContrast, textScale, isAuthenticated, patients, latestRisk]
+    [lang, role, darkMode, highContrast, textScale, isAuthenticated, sessionToken, patients, latestRisk]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
