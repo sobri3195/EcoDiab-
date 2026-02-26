@@ -5,18 +5,21 @@ import App from './App';
 import { ToastProvider } from './components/Toast';
 import { AppProvider } from './lib/app-context';
 import { AlertCenterProvider } from './lib/alert-center-context';
+import { I18nProvider } from './lib/i18n';
 import './styles.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AppProvider>
-        <AlertCenterProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </AlertCenterProvider>
-      </AppProvider>
+      <I18nProvider>
+        <AppProvider>
+          <AlertCenterProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </AlertCenterProvider>
+        </AppProvider>
+      </I18nProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
