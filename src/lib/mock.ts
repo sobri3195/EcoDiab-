@@ -221,3 +221,19 @@ export const dietaryProfiles = {
     foods: ['oat', 'tahu kukus', 'telur rebus', 'bayam', 'jambu biji'],
   },
 };
+
+export const dietaryEmissionTrend = [
+  { week: 'Minggu 1', score: 72 },
+  { week: 'Minggu 2', score: 68 },
+  { week: 'Minggu 3', score: 62 },
+  { week: 'Minggu 4', score: 58 },
+  { week: 'Minggu 5', score: 55 },
+  { week: 'Minggu 6', score: 51 },
+];
+
+export const foodSubstitutions = [
+  { id: 'beef-topeh', current: 'Daging sapi (150g)', alternative: 'Tempe panggang (150g)', currentKgCo2: 4.5, alternativeKgCo2: 0.8 },
+  { id: 'milk-oat', current: 'Susu sapi (250ml)', alternative: 'Susu oat (250ml)', currentKgCo2: 0.9, alternativeKgCo2: 0.3 },
+  { id: 'shrimp-tofu', current: 'Udang (120g)', alternative: 'Tahu kukus (120g)', currentKgCo2: 1.8, alternativeKgCo2: 0.4 },
+  { id: 'cheese-avocado', current: 'Keju cheddar (40g)', alternative: 'Alpukat (80g)', currentKgCo2: 0.6, alternativeKgCo2: 0.2 },
+];
