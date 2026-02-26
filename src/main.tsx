@@ -4,15 +4,18 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { ToastProvider } from './components/Toast';
 import { AppProvider } from './lib/app-context';
+import { AlertCenterProvider } from './lib/alert-center-context';
 import './styles.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <AppProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
+        <AlertCenterProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </AlertCenterProvider>
       </AppProvider>
     </BrowserRouter>
   </React.StrictMode>

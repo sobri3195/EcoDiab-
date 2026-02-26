@@ -22,7 +22,11 @@ export type Alert = {
   id: string;
   severity: 'Low' | 'Moderate' | 'High';
   patient: string;
+  title: string;
   action: string;
+  category: 'Clinical' | 'Engagement' | 'Operational';
+  createdAt: string;
+  resolved: boolean;
 };
 
 export const patients: Patient[] = [
@@ -114,9 +118,56 @@ export const patients: Patient[] = [
 ];
 
 export const alerts: Alert[] = [
-  { id: 'A1', severity: 'High', patient: 'Ayu Putri', action: 'Urgent retinal screening + BP control plan' },
-  { id: 'A2', severity: 'Moderate', patient: 'Siti Rahma', action: 'Medication adherence coaching this week' },
-  { id: 'A3', severity: 'Low', patient: 'Budi Santoso', action: 'Switch next visit to telemedicine' },
+  {
+    id: 'A1',
+    severity: 'High',
+    patient: 'Ayu Putri',
+    title: 'Retina screening overdue',
+    action: 'Urgent retinal screening + BP control plan',
+    category: 'Clinical',
+    createdAt: '2025-03-17T09:10:00Z',
+    resolved: false,
+  },
+  {
+    id: 'A2',
+    severity: 'Moderate',
+    patient: 'Siti Rahma',
+    title: 'Adherence dropped this week',
+    action: 'Medication adherence coaching this week',
+    category: 'Engagement',
+    createdAt: '2025-03-16T11:20:00Z',
+    resolved: false,
+  },
+  {
+    id: 'A3',
+    severity: 'Low',
+    patient: 'Budi Santoso',
+    title: 'Telemedicine conversion opportunity',
+    action: 'Switch next visit to telemedicine',
+    category: 'Operational',
+    createdAt: '2025-03-15T10:00:00Z',
+    resolved: false,
+  },
+  {
+    id: 'A4',
+    severity: 'High',
+    patient: 'Dedi Saputra',
+    title: 'Foot ulcer follow-up due',
+    action: 'Arrange wound care follow-up in 24 hours',
+    category: 'Clinical',
+    createdAt: '2025-03-17T05:00:00Z',
+    resolved: false,
+  },
+  {
+    id: 'A5',
+    severity: 'Moderate',
+    patient: 'Rina Lestari',
+    title: 'Nutrition journal inactive',
+    action: 'Trigger dietary assistant nudge campaign',
+    category: 'Engagement',
+    createdAt: '2025-03-14T08:30:00Z',
+    resolved: true,
+  },
 ];
 
 export const riskDistribution = [

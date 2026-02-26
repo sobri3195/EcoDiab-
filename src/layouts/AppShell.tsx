@@ -1,8 +1,9 @@
-import { Moon, Sun } from 'lucide-react';
+import { BellRing, Moon, Sun } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../lib/app-context';
+import { useAlertCenter } from '../lib/alert-center-context';
 
 const pageLabel: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -11,10 +12,12 @@ const pageLabel: Record<string, string> = {
   'follow-up': 'Follow-up',
   green: 'Green Report',
   'dietary-assistant': 'Dietary Assistant',
+  alerts: 'Smart Alerts',
 };
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { lang, setLang, role, setRole, darkMode, toggleDarkMode, highContrast, toggleHighContrast, textScale, setTextScale } = useAppContext();
+  const { unresolvedCount } = useAlertCenter();
   const location = useLocation();
   const pathParts = location.pathname.split('/').filter(Boolean);
 
@@ -54,6 +57,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   <option value="normal">Text: Normal</option>
                   <option value="large">Text: Large</option>
                 </select>
+                <Link
+                  to="/alerts"
+                  className="relative inline-flex min-h-11 items-center gap-2 rounded-md border border-slate-300 px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  <BellRing className="h-4 w-4" /> Alerts
+                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">{unresolvedCount}</span>
+                </Link>
                 <button
                   onClick={toggleHighContrast}
                   className={`rounded-md border px-2 py-1 text-xs font-semibold transition-colors ${highContrast ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'border-slate-300 text-slate-600 dark:border-slate-700 dark:text-slate-200'}`}

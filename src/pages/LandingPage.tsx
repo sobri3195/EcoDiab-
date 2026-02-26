@@ -12,7 +12,6 @@ import {
   Users,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import BrandLogo from '../components/BrandLogo';
 import MarketingLayout from '../layouts/MarketingLayout';
 import { useAppContext } from '../lib/app-context';
 
