@@ -5,6 +5,7 @@ import App from './App';
 import { ToastProvider } from './components/Toast';
 import { AppProvider } from './lib/app-context';
 import { AlertCenterProvider } from './lib/alert-center-context';
+import { initializeOfflineSync } from './lib/api';
 import { I18nProvider } from './lib/i18n';
 import './styles.css';
 
