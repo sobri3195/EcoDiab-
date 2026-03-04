@@ -1,11 +1,12 @@
-import { BellRing, Menu, Moon, Sun, X } from 'lucide-react';
+import { BellRing, Menu, Moon, Search, Sun, X } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { useAppContext } from '../lib/app-context';
 import { useAlertCenter } from '../lib/alert-center-context';
 import { clearConflictNotes, useSyncStatus } from '../lib/api';
+import { useAppContext } from '../lib/app-context';
+import { workspaceModules } from '../lib/module-catalog';
 
 const pageLabel: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -17,6 +18,12 @@ const pageLabel: Record<string, string> = {
   alerts: 'Smart Alerts',
   education: 'Patient Education',
   achievements: 'Achievements',
+  'personal-goals': 'Personal Goals',
+  'medication-adherence': 'Medication Adherence',
+  'telemedicine-hub': 'Telemedicine Hub',
+  'lab-insights': 'Lab Insights',
+  'community-support': 'Community Support',
+  'operations-center': 'Operations Center',
 };
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -25,7 +32,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const syncStatus = useSyncStatus();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [moduleKeyword, setModuleKeyword] = useState('');
   const pathParts = location.pathname.split('/').filter(Boolean);
+
+  const filteredModules = useMemo(
+    () => workspaceModules.filter((item) => item.label.toLowerCase().includes(moduleKeyword.toLowerCase())).slice(0, 4),
+    [moduleKeyword]
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -96,6 +109,28 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </button>
               </div>
+            </div>
+            <div className="rounded-xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-cyan-50 p-3 dark:border-emerald-900/40 dark:from-emerald-950/30 dark:via-slate-900 dark:to-cyan-950/30">
+              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Quick module launcher</label>
+              <div className="mt-1 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
+                <Search className="h-4 w-4 text-slate-400" />
+                <input
+                  value={moduleKeyword}
+                  onChange={(event) => setModuleKeyword(event.target.value)}
+                  placeholder="Cari modul: risk, lab, telemedicine..."
+                  className="w-full bg-transparent text-sm outline-none"
+                />
+              </div>
+              {moduleKeyword ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {filteredModules.map((module) => (
+                    <Link key={module.to} to={module.to} className="rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200">
+                      {module.label}
+                    </Link>
+                  ))}
+                  {filteredModules.length === 0 ? <span className="text-xs text-slate-500">Tidak ada modul yang cocok.</span> : null}
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className={`rounded-full px-2 py-1 font-semibold ${syncStatus.isOnline ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'}`}>

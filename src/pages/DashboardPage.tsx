@@ -10,6 +10,7 @@ import { api, type DashboardPayload } from '../lib/api';
 import { dictionary, useAppContext } from '../lib/app-context';
 import { logError, logEvent } from '../lib/logger';
 import { alerts as mockAlerts, dashboardMetrics, monthlyPaperReduction, monthlyVisitReduction, riskDistribution } from '../lib/mock';
+import { workspaceModules } from '../lib/module-catalog';
 import {
   matchWidgetsByRules,
   type ActionWidget,
@@ -197,6 +198,26 @@ export default function DashboardPage() {
         <Card title="Visits reduced"><ResponsiveContainer width="100%" height={240}><LineChart data={dashboard?.monthlyVisitReduction ?? []}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={3} dot={{ r: 4 }} /></LineChart></ResponsiveContainer></Card>
         <Card title="Paper reduced"><ResponsiveContainer width="100%" height={240}><AreaChart data={dashboard?.monthlyPaperReduction ?? []}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="month" /><YAxis /><Tooltip /><Area type="monotone" dataKey="value" stroke="#059669" fill="#6ee7b7" /></AreaChart></ResponsiveContainer></Card>
       </div>
+
+
+
+      <Card title="Ekspansi platform: 5 modul baru + 5 fitur UX" tone="primary">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {workspaceModules.filter((item) => item.group === 'Extension modules').map((module) => (
+            <Link key={module.to} to={module.to} className="rounded-xl border border-emerald-200 bg-white px-3 py-3 text-sm transition hover:-translate-y-0.5 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-slate-900">
+              <p className="font-semibold text-slate-800 dark:text-slate-100">{module.label}</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{module.description}</p>
+            </Link>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-xs text-slate-600 dark:text-slate-300 md:grid-cols-2">
+          <li>• Quick Module Launcher di header untuk akses cepat.</li>
+          <li>• Sidebar dikelompokkan berdasarkan workflow agar navigasi lebih jelas.</li>
+          <li>• Hero gradient pada tiap modul untuk hierarki visual yang konsisten.</li>
+          <li>• Filter interaktif per modul (threshold, readiness, multi-select).</li>
+          <li>• Breadcrumb + status sync tetap dipertahankan untuk orientasi pengguna.</li>
+        </ul>
+      </Card>
 
       <Card title="Recent alerts">
         {(dashboard?.alerts.length ?? 0) === 0 ? <EmptyState message="Belum ada alert klinis terbaru." /> : null}
