@@ -1,5 +1,6 @@
-import { Activity, BarChart3, BellRing, BookOpenCheck, CalendarCheck2, Leaf, Salad, ShieldAlert, Target, Users } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { workspaceModules } from '../lib/module-catalog';
 import BrandLogo from './BrandLogo';
 
 type SidebarProps = {
@@ -8,27 +9,7 @@ type SidebarProps = {
   onNavigate?: () => void;
 };
 
-const navGroups = [
-  {
-    label: 'Core workflow',
-    items: [
-      { to: '/dashboard', icon: Activity, label: 'Dashboard' },
-      { to: '/patients', icon: Users, label: 'Patients' },
-      { to: '/ai-risk', icon: ShieldAlert, label: 'AI Risk' },
-      { to: '/follow-up', icon: CalendarCheck2, label: 'Follow-up' },
-      { to: '/alerts', icon: BellRing, label: 'Smart Alerts' },
-      { to: '/education', icon: BookOpenCheck, label: 'Patient Education' },
-      { to: '/personal-goals', icon: Target, label: 'Personal Goals' },
-    ],
-  },
-  {
-    label: 'Sustainability',
-    items: [
-      { to: '/green', icon: Leaf, label: 'Green' },
-      { to: '/dietary-assistant', icon: Salad, label: 'Dietary Assistant' },
-    ],
-  },
-];
+const navGroups = ['Core workflow', 'Sustainability', 'Extension modules'] as const;
 
 export default function Sidebar({ role, className = '', onNavigate }: SidebarProps) {
   return (
@@ -39,14 +20,15 @@ export default function Sidebar({ role, className = '', onNavigate }: SidebarPro
       <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-500">Navigation</h2>
       <div className="space-y-4">
         {navGroups.map((group) => (
-          <section key={group.label}>
-            <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{group.label}</p>
+          <section key={group}>
+            <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{group}</p>
             <div className="space-y-1">
-              {group.items.map((item) => (
+              {workspaceModules.filter((item) => item.group === group).map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   onClick={onNavigate}
+                  title={item.description}
                   className={({ isActive }) =>
                     `group flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${isActive ? 'border-emerald-200 bg-emerald-50 text-emerald-800 shadow-sm dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-800'}`
                   }

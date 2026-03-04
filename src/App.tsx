@@ -12,6 +12,11 @@ import SmartAlertCenterPage from './pages/SmartAlertCenterPage';
 import PatientEducationPage from './pages/PatientEducationPage';
 import PatientEducationAchievementsPage from './pages/PatientEducationAchievementsPage';
 import PersonalGoalTrackerPage from './pages/PersonalGoalTrackerPage';
+import CommunitySupportPage from './pages/CommunitySupportPage';
+import LabInsightsPage from './pages/LabInsightsPage';
+import MedicationAdherencePage from './pages/MedicationAdherencePage';
+import OperationsCenterPage from './pages/OperationsCenterPage';
+import TelemedicineHubPage from './pages/TelemedicineHubPage';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAppContext();
@@ -38,6 +43,11 @@ function AppRoutes() {
       <Route path="/education" element={<ProtectedRoute><AppShell><PatientEducationPage /></AppShell></ProtectedRoute>} />
       <Route path="/education/achievements" element={<ProtectedRoute><AppShell><PatientEducationAchievementsPage /></AppShell></ProtectedRoute>} />
       <Route path="/personal-goals" element={<ProtectedRoute><AppShell><PersonalGoalTrackerPage /></AppShell></ProtectedRoute>} />
+      <Route path="/medication-adherence" element={<ProtectedRoute><AppShell><MedicationAdherencePage /></AppShell></ProtectedRoute>} />
+      <Route path="/telemedicine-hub" element={<ProtectedRoute><AppShell><TelemedicineHubPage /></AppShell></ProtectedRoute>} />
+      <Route path="/lab-insights" element={<ProtectedRoute><AppShell><LabInsightsPage /></AppShell></ProtectedRoute>} />
+      <Route path="/community-support" element={<ProtectedRoute><AppShell><CommunitySupportPage /></AppShell></ProtectedRoute>} />
+      <Route path="/operations-center" element={<ProtectedRoute><AppShell><OperationsCenterPage /></AppShell></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
