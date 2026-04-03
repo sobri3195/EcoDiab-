@@ -9,6 +9,12 @@ import { initializeOfflineSync } from './lib/api';
 import { I18nProvider } from './lib/i18n';
 import './styles.css';
 
+window.addEventListener('error', (event) => {
+  if (event.filename.startsWith('chrome-extension://')) {
+    event.preventDefault();
+  }
+});
+
 initializeOfflineSync();
 
 if ('serviceWorker' in navigator) {
