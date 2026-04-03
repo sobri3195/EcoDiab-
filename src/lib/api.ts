@@ -1,4 +1,13 @@
 import { useSyncExternalStore } from 'react';
+import {
+  dashboardMetrics,
+  monthlyPaperReduction,
+  monthlyVisitReduction,
+  patients as seedPatients,
+  riskDistribution,
+  alerts as seedAlerts,
+  dietaryProfiles,
+} from './mock';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
@@ -44,7 +53,9 @@ export class MutationQueuedError extends Error {
   }
 }
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:8080/api';
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const useMockApi = ((import.meta.env.VITE_USE_MOCK_API as string | undefined) ?? (configuredApiBaseUrl ? 'false' : 'true')) === 'true';
+const API_BASE_URL = configuredApiBaseUrl ?? '';
 const QUEUE_KEY = 'ecodiab-offline-queue-v1';
 const CONFLICT_KEY = 'ecodiab-sync-conflicts-v1';
 
@@ -231,6 +242,10 @@ function isMutationMethod(method: HttpMethod) {
 }
 
 async function request<T>(path: string, method: HttpMethod, body?: unknown): Promise<T> {
+  if (useMockApi) {
+    return mockRequest<T>(path, method, body);
+  }
+
   let config: RequestInit & { url: string } = {
     url: `${API_BASE_URL}${path}`,
     method,
@@ -320,6 +335,152 @@ export type FollowUpTask = {
 };
 
 export type FollowUpStatus = FollowUpTask['status'];
+
+let mockPatients: PatientPayload[] = seedPatients.map((patient) => ({
+  id: patient.id,
+  name: patient.name,
+  age: patient.age,
+  medicalHistory: patient.complications.join(', ') || 'Diabetes management monitoring',
+  gender: patient.gender,
+  hba1c: patient.hba1c,
+  bmi: patient.bmi,
+  systolicBP: patient.systolicBP,
+  ldl: patient.ldl,
+  adherence: patient.adherence,
+  visitFrequency: patient.visitFrequency,
+  lastVisit: patient.lastVisit,
+  riskTier: patient.riskTier,
+  visitPattern: patient.visitPattern,
+  complications: patient.complications,
+  telemedicineEligible: patient.telemedicineEligible,
+}));
+
+let mockFollowUps: FollowUpTask[] = [
+  { id: 'FU-001', patientName: 'Ayu Putri', dueDate: '2026-04-04', recommendation: 'Urgent retinal screening + BP review', status: 'overdue' },
+  { id: 'FU-002', patientName: 'Siti Rahma', dueDate: '2026-04-08', recommendation: 'Medication adherence coaching session', status: 'pending' },
+  { id: 'FU-003', patientName: 'Budi Santoso', dueDate: '2026-04-12', recommendation: 'Convert follow-up to telemedicine', status: 'completed' },
+];
+
+function createFallbackResponse(path: string): ApiError {
+  return new ApiError(`Mock endpoint belum tersedia untuk ${path}`, 404, { path });
+}
+
+async function mockRequest<T>(path: string, method: HttpMethod, body?: unknown): Promise<T> {
+  if (path === '/dashboard' && method === 'GET') {
+    return {
+      metrics: dashboardMetrics,
+      riskDistribution,
+      monthlyVisitReduction,
+      monthlyPaperReduction,
+      alerts: seedAlerts.map(({ id, severity, patient, action }) => ({ id, severity, patient, action })),
+    } as T;
+  }
+
+  if (path === '/patients' && method === 'GET') {
+    return [...mockPatients] as T;
+  }
+
+  if (path === '/patients' && method === 'POST') {
+    const payload = (body ?? {}) as Omit<PatientPayload, 'id'>;
+    const created: PatientPayload = { id: `P-${Date.now()}`, ...payload };
+    mockPatients = [created, ...mockPatients];
+    return created as T;
+  }
+
+  if (path.startsWith('/patients/') && method === 'PUT') {
+    const patientId = path.split('/')[2];
+    const payload = (body ?? {}) as Omit<PatientPayload, 'id'>;
+    const updated: PatientPayload = { id: patientId, ...payload };
+    mockPatients = mockPatients.map((item) => (item.id === patientId ? updated : item));
+    return updated as T;
+  }
+
+  if (path.startsWith('/patients/') && method === 'DELETE') {
+    const patientId = path.split('/')[2];
+    mockPatients = mockPatients.filter((item) => item.id !== patientId);
+    return { success: true } as T;
+  }
+
+  if (path === '/follow-ups' && method === 'GET') {
+    return [...mockFollowUps] as T;
+  }
+
+  if (path === '/follow-ups/generate' && method === 'POST') {
+    mockFollowUps = mockPatients.slice(0, 4).map((patient, index) => ({
+      id: `FU-GEN-${index + 1}`,
+      patientName: patient.name,
+      dueDate: new Date(Date.now() + (index + 1) * 86400000).toISOString().slice(0, 10),
+      recommendation: `Review treatment plan for ${patient.name} and confirm follow-up channel.`,
+      status: index % 3 === 0 ? 'overdue' : index % 2 === 0 ? 'completed' : 'pending',
+    }));
+    return [...mockFollowUps] as T;
+  }
+
+  if (path.startsWith('/follow-ups/') && method === 'PATCH') {
+    const taskId = path.split('/')[2];
+    const task = mockFollowUps.find((item) => item.id === taskId);
+    if (!task) throw createFallbackResponse(path);
+
+    const payload = (body ?? {}) as { status?: FollowUpStatus; dueDate?: string };
+    const mappedStatus =
+      path.endsWith('/complete') ? 'completed' : path.endsWith('/postpone') ? 'overdue' : payload.status ?? task.status;
+    const mappedDueDate = path.endsWith('/reschedule') ? payload.dueDate ?? task.dueDate : payload.dueDate ?? task.dueDate;
+    const updated = { ...task, status: mappedStatus, dueDate: mappedDueDate };
+    mockFollowUps = mockFollowUps.map((item) => (item.id === taskId ? updated : item));
+    return updated as T;
+  }
+
+  if (path === '/risk/predict' && method === 'POST') {
+    const payload = (body ?? {}) as {
+      hba1c?: number;
+      bmi?: number;
+      systolicBP?: number;
+      ldl?: number;
+      adherence?: number;
+      visitFrequency?: number;
+      priorComplications?: string[];
+    };
+    const complicationCount = payload.priorComplications?.length ?? 0;
+    const score = Math.min(
+      100,
+      Math.round(
+        (payload.hba1c ?? 7) * 6 +
+          (payload.bmi ?? 25) * 0.8 +
+          (payload.systolicBP ?? 130) * 0.15 +
+          (payload.ldl ?? 110) * 0.1 +
+          complicationCount * 8 -
+          (payload.adherence ?? 70) * 0.2 -
+          (payload.visitFrequency ?? 3) * 1.5
+      )
+    );
+    const category: RiskPredictionResponse['category'] = score >= 80 ? 'Critical' : score >= 60 ? 'High' : score >= 40 ? 'Moderate' : 'Low';
+    return {
+      score,
+      category,
+      reasons: [
+        category === 'Critical' || category === 'High' ? 'HbA1c and blood pressure above target.' : 'Metabolic profile relatively stable.',
+        complicationCount > 0 ? `${complicationCount} prior complication(s) detected.` : 'No prior complication recorded.',
+      ],
+      complicationProbability: Math.min(95, Math.max(8, score - 5)),
+      hospitalizationRisk: Math.min(85, Math.max(4, Math.round(score * 0.7))),
+    } as T;
+  }
+
+  if (path.includes('/risk-history') && method === 'POST') {
+    return { success: true } as T;
+  }
+
+  if (path === '/dietary/recommendations' && method === 'POST') {
+    const payload = (body ?? {}) as { calories?: number; sugar?: number; preference?: keyof typeof dietaryProfiles };
+    const profile = dietaryProfiles[payload.preference ?? 'standard'] ?? dietaryProfiles.standard;
+    return {
+      summary: `Target ${payload.calories ?? profile.calories} kkal/hari dengan batas gula ${payload.sugar ?? 30}g.`,
+      recommendations: profile.foods.map((food) => `Prioritaskan ${food}.`),
+    } as T;
+  }
+
+  throw createFallbackResponse(path);
+}
 
 export const api = {
   get: <T>(path: string) => request<T>(path, 'GET'),
