@@ -1,228 +1,413 @@
+import { useEffect, useMemo, useState } from 'react';
 import {
+  Activity,
   ArrowRight,
+  BarChart3,
   Brain,
-  CalendarClock,
-  CheckCircle2,
+  BriefcaseMedical,
+  Building2,
+  Cloud,
+  Gauge,
+  GraduationCap,
   HeartPulse,
-  Leaf,
-  ShieldCheck,
-  Sprout,
+  Hospital,
+  Languages,
+  Layers,
+  Link2,
+  MonitorSmartphone,
+  ShieldAlert,
+  Smartphone,
   Stethoscope,
-  TimerReset,
   Users,
+  Watch,
+  WifiOff,
 } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import MarketingLayout from '../layouts/MarketingLayout';
-import { useAppContext } from '../lib/app-context';
-import { useI18n } from '../lib/i18n';
+
+const aiFeatures = [
+  { title: 'Complication Radar Engine', type: 'Predictive AI', description: 'Flags rising multi-organ risk from labs, vitals, symptoms, and adherence drift before crisis.' },
+  { title: 'AI Glycemia Forecast', type: 'Predictive AI', description: 'Projects short and medium-term glucose trajectories to support proactive intervention plans.' },
+  { title: 'Deterioration & Readmission Sentinel', type: 'Predictive AI', description: 'Monitors post-visit instability and predicts avoidable readmissions for targeted outreach.' },
+  { title: 'Insulin Titration Copilot', type: 'Therapeutic / Curative Support AI', description: 'Suggests evidence-aligned dose adjustments for clinician review based on trends and patient profile.' },
+  { title: 'Smart Foot Ulcer Vision', type: 'Therapeutic / Curative Support AI', description: 'Assists triage and severity scoring from wound images to accelerate treatment escalation.' },
+  { title: 'Retinopathy Screening AI', type: 'Therapeutic / Curative Support AI', description: 'Supports early retinal risk detection and referral prioritization in resource-limited settings.' },
+  { title: 'Personal Health Digital Twin', type: 'Prognostic AI', description: 'Simulates likely outcomes under different therapy, behavior, and follow-up scenarios.' },
+  { title: 'Time-to-Complication Prognosis Mapper', type: 'Prognostic AI', description: 'Estimates likely timeline to key complications to personalize preventive intensity.' },
+  { title: 'Grounded Multilingual Diabetes Coach', type: 'Educative AI', description: 'Delivers guideline-grounded education in local language with literacy-aware explanations.' },
+  { title: 'Adaptive Behavior-Change & Microlearning Engine', type: 'Educative AI', description: 'Personalizes nudges, reminders, and micro-lessons by context, readiness, and engagement pattern.' },
+] as const;
+
+const journeyStages = [
+  {
+    name: 'Risk Capture',
+    actor: 'Community clinic + patient app',
+    detail: 'Offline-lite intake, baseline labs, social risk context, and device sync establish longitudinal risk profile.',
+  },
+  {
+    name: 'AI Stratification',
+    actor: 'Care coordinator + AI engine',
+    detail: 'Complication radar and glycemia forecasts triage patients into dynamic care pathways and urgency tiers.',
+  },
+  {
+    name: 'Therapy Orchestration',
+    actor: 'Clinician dashboard',
+    detail: 'Titration copilot and alerts suggest intervention plans while preserving physician authority and auditability.',
+  },
+  {
+    name: 'Continuous Recovery Loop',
+    actor: 'Patient + caregiver + payer',
+    detail: 'Education coach, adherence monitoring, and utilization insights sustain outcomes and reduce preventable cost.',
+  },
+] as const;
+
+const counters = [
+  { label: 'Projected avoidable readmission reduction', value: 38, suffix: '%' },
+  { label: 'Faster high-risk identification', value: 2.4, suffix: 'x' },
+  { label: 'Increase in protocol adherence visibility', value: 89, suffix: '%' },
+];
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, login } = useAppContext();
-  const { t } = useI18n();
+  const [activeJourney, setActiveJourney] = useState(0);
+  const [counterValues, setCounterValues] = useState([0, 0, 0]);
 
-  const redirectTo = (location.state as { redirectTo?: string } | null)?.redirectTo ?? '/dashboard';
+  useEffect(() => {
+    const nodes = document.querySelectorAll<HTMLElement>('.reveal-on-scroll');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 },
+    );
 
-  const features = [
-    { icon: Brain, title: t('landing.featureOneTitle'), description: t('landing.featureOneDescription') },
-    { icon: CalendarClock, title: t('landing.featureTwoTitle'), description: t('landing.featureTwoDescription') },
-    { icon: Leaf, title: t('landing.featureThreeTitle'), description: t('landing.featureThreeDescription') },
-  ];
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
 
-  const steps = [
-    { icon: Stethoscope, title: t('landing.stepOneTitle'), description: t('landing.stepOneDescription') },
-    { icon: Brain, title: t('landing.stepTwoTitle'), description: t('landing.stepTwoDescription') },
-    { icon: Sprout, title: t('landing.stepThreeTitle'), description: t('landing.stepThreeDescription') },
-  ];
+  useEffect(() => {
+    const impact = document.getElementById('impact-counters');
+    if (!impact) return;
 
-  const highlights = [
-    { icon: Users, label: t('landing.impactCardOne'), value: '120+' },
-    { icon: TimerReset, label: t('landing.impactCardTwo'), value: '-42%' },
-    { icon: HeartPulse, label: t('landing.impactCardThree'), value: '89%' },
-  ];
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        const startedAt = performance.now();
+        const duration = 1400;
+
+        const animate = (now: number) => {
+          const progress = Math.min((now - startedAt) / duration, 1);
+          setCounterValues(counters.map((item) => Number((item.value * progress).toFixed(1))));
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
+        observer.disconnect();
+      },
+      { threshold: 0.4 },
+    );
+
+    observer.observe(impact);
+    return () => observer.disconnect();
+  }, []);
+
+  const navItems = useMemo(
+    () => [
+      ['home', 'Home'],
+      ['problem', 'Problem'],
+      ['solution', 'Solution'],
+      ['ai-features', 'AI Features'],
+      ['wins', 'Why EcoDiab AI Wins'],
+      ['business-model', 'Business Model'],
+      ['go-to-market', 'Go-to-Market'],
+      ['roadmap', 'Roadmap'],
+      ['team', 'Team'],
+      ['contact', 'Contact'],
+    ],
+    [],
+  );
 
   return (
     <MarketingLayout>
-      <section className="relative isolate overflow-hidden" aria-labelledby="hero-title">
-        <div className="absolute -left-24 top-10 -z-10 h-72 w-72 rounded-full bg-emerald-300/40 blur-3xl dark:bg-emerald-700/30" aria-hidden="true" />
-        <div className="absolute -right-16 top-44 -z-10 h-72 w-72 rounded-full bg-sky-300/40 blur-3xl dark:bg-sky-700/30" aria-hidden="true" />
-
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.2fr_0.8fr] md:py-20">
+      <section id="home" className="mx-auto max-w-6xl px-4 pb-14 pt-14 reveal-on-scroll" aria-labelledby="hero-title">
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t('landing.badge')}
-            </span>
-            <h1 id="hero-title" className="mt-6 text-4xl font-bold leading-tight text-slate-900 md:text-6xl dark:text-slate-100">
-              {t('landing.heroTitleStart')} <span className="text-emerald-700 dark:text-emerald-400">{t('landing.heroTitleStrongOne')}</span>
-              {t('landing.heroTitleMiddle')} <span className="text-sky-700 dark:text-sky-400">{t('landing.heroTitleStrongTwo')}</span>
-              {t('landing.heroTitleEnd')}
+            <p className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-900">
+              <ShieldAlert className="h-3.5 w-3.5" /> Chronic Care Intelligence Platform
+            </p>
+            <h1 id="hero-title" className="mt-5 text-4xl font-bold leading-tight text-slate-900 md:text-6xl">
+              AI for Predictive, Continuous, and Equitable Diabetes Care
             </h1>
-            <p className="mt-5 max-w-2xl text-lg text-slate-700 dark:text-slate-200">{t('landing.heroDescription')}</p>
-
-            <div className="mt-8 flex flex-wrap gap-3" role="group" aria-label="Primary actions">
-              {isAuthenticated ? (
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 font-semibold text-white shadow-lg shadow-emerald-700/30 transition hover:-translate-y-0.5 hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
-                >
-                  {t('landing.ctaDashboard')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              ) : (
-                <button
-                  onClick={() => {
-                    login('demo-session-token');
-                    navigate(redirectTo);
-                  }}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 font-semibold text-white shadow-lg shadow-emerald-700/30 transition hover:-translate-y-0.5 hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
-                >
-                  {t('landing.ctaLogin')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </button>
-              )}
-              <a
-                href="#features"
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-400 px-5 py-3 font-semibold text-slate-800 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2 dark:border-slate-500 dark:text-slate-100 dark:hover:bg-slate-800"
-              >
-                {t('landing.ctaExplore')}
-              </a>
+            <p className="mt-5 max-w-2xl text-lg text-slate-700">
+              EcoDiab AI is an intelligent care orchestration layer for chronic disease management in low-resource and semi-connected settings—built for interoperable, offline-lite operations across web, mobile, desktop, and smartwatch.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href="#contact" className="rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-teal-700/20 transition hover:-translate-y-0.5 hover:bg-teal-800">Request Demo</a>
+              <a href="#business-model" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100">View Pilot Model</a>
+              <a href="#ai-features" className="rounded-xl border border-teal-300 bg-teal-50 px-5 py-3 text-sm font-semibold text-teal-900 transition hover:bg-teal-100">See AI Features</a>
             </div>
-
-            <ul className="mt-8 grid max-w-2xl gap-3 text-sm text-slate-700 dark:text-slate-200 sm:grid-cols-2" role="list">
-              {[t('landing.quickItemOne'), t('landing.quickItemTwo')].map((item) => (
-                <li key={item} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white/80 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/60">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-700" aria-hidden="true" /> {item}
-                </li>
-              ))}
-            </ul>
           </div>
 
-          <aside className="rounded-2xl border border-slate-300 bg-white/90 p-6 shadow-xl backdrop-blur dark:border-slate-700 dark:bg-slate-900/80" aria-label={t('landing.quickAnalysisTitle')}>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('landing.quickAnalysisTitle')}</h2>
-            <div className="mt-5 space-y-4">
-              <div className="rounded-xl bg-emerald-100 p-4 dark:bg-emerald-900/25">
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-900 dark:text-emerald-200">{t('landing.efficiencyLabel')}</p>
-                <p className="mt-1 text-3xl font-bold text-emerald-900 dark:text-emerald-200">+38%</p>
-              </div>
-              <div className="rounded-xl bg-sky-100 p-4 dark:bg-sky-900/25">
-                <p className="text-xs font-semibold uppercase tracking-wide text-sky-900 dark:text-sky-200">{t('landing.detectionLabel')}</p>
-                <p className="mt-1 text-3xl font-bold text-sky-900 dark:text-sky-200">2.4x</p>
-              </div>
-              <div className="rounded-xl bg-amber-100 p-4 dark:bg-amber-900/25">
-                <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-200">{t('landing.paperlessLabel')}</p>
-                <p className="mt-1 text-3xl font-bold text-amber-900 dark:text-amber-200">~65%</p>
-              </div>
+          <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Connected Care Ecosystem</h2>
+            <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+              {[
+                ['Website Portal', MonitorSmartphone],
+                ['Mobile Companion', Smartphone],
+                ['Desktop Command Center', Building2],
+                ['Smartwatch Signals', Watch],
+              ].map(([label, Icon]) => (
+                <div key={label as string} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <Icon className="h-5 w-5 text-teal-700" />
+                  <p className="mt-2 font-medium text-slate-800">{label as string}</p>
+                </div>
+              ))}
             </div>
+            <p className="mt-4 text-sm text-slate-600">Interoperable with EMR, lab, pharmacy, and claims pathways with sync recovery for low-connectivity environments.</p>
           </aside>
         </div>
+        <div className="mt-8 hidden flex-wrap gap-3 md:flex">
+          {navItems.map(([id, label]) => (
+            <a key={id} href={`#${id}`} className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-teal-400 hover:text-teal-800">{label}</a>
+          ))}
+        </div>
       </section>
 
-      <section id="features" className="mx-auto max-w-6xl px-4 pb-12" aria-labelledby="features-title">
-        <h2 id="features-title" className="text-2xl font-bold md:text-3xl">{t('landing.featuresTitle')}</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {features.map(({ icon: Icon, title, description }) => (
-            <article key={title} className="rounded-xl border border-slate-300 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-              <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-              <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{description}</p>
+      <section id="problem" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Problem</h2>
+        <p className="mt-3 max-w-4xl text-slate-700">Current diabetes workflows in many hospitals and public systems remain episodic, fragmented, and reactive—especially where staff, specialist access, and internet reliability are constrained.</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {['Manual triage delays risk response', 'Siloed telemedicine misses longitudinal context', 'Standalone devices and fragmented EMR limit continuity'].map((item) => (
+            <article key={item} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <ShieldAlert className="h-5 w-5 text-rose-700" />
+              <p className="mt-3 text-sm font-medium text-slate-800">{item}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section id="impact" className="mx-auto max-w-6xl px-4 pb-10" aria-labelledby="impact-title">
-        <h2 id="impact-title" className="text-2xl font-bold md:text-3xl">{t('landing.impactTitle')}</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {highlights.map(({ icon: Icon, label, value }) => (
-            <article key={label} className="rounded-xl border border-slate-300 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-              <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-              <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">{label}</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
+      <section id="solution" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Solution</h2>
+        <p className="mt-3 max-w-4xl text-slate-700">EcoDiab AI orchestrates predictive, therapeutic decision support, prognostic planning, and educative engagement as a single care intelligence layer aligned to real clinical governance.</p>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="font-semibold text-slate-900">Before vs After Care Model</h3>
+            <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+                <p className="font-semibold text-rose-900">Before</p>
+                <ul className="mt-2 space-y-1 text-rose-900/90">
+                  <li>• Late complication detection</li>
+                  <li>• Visit-by-visit decision making</li>
+                  <li>• Low visibility on adherence</li>
+                </ul>
+              </div>
+              <div className="rounded-xl border border-teal-200 bg-teal-50 p-3">
+                <p className="font-semibold text-teal-900">After</p>
+                <ul className="mt-2 space-y-1 text-teal-900/90">
+                  <li>• Proactive risk escalation</li>
+                  <li>• Continuous AI-supported care</li>
+                  <li>• Shared data for clinicians and payers</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="font-semibold text-slate-900">Interoperability + Offline-Lite Architecture</h3>
+            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+              {[
+                ['HL7/FHIR bridge', Link2],
+                ['Edge cache + sync queue', WifiOff],
+                ['Cloud policy engine', Cloud],
+                ['Role-based dashboard APIs', Layers],
+              ].map(([label, Icon]) => (
+                <div key={label as string} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <Icon className="h-4 w-4 text-teal-700" />
+                  <p className="mt-2 font-medium text-slate-700">{label as string}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="ai-features" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">10 Advanced AI Features</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {aiFeatures.map((feature) => (
+            <article key={feature.title} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md">
+              <Brain className="h-5 w-5 text-teal-700" />
+              <p className="mt-3 inline-block rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">{feature.type}</p>
+              <h3 className="mt-3 font-semibold text-slate-900">{feature.title}</h3>
+              <p className="mt-2 text-sm text-slate-700">{feature.description}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-10" aria-labelledby="ux-title">
-        <div className="rounded-2xl border border-slate-300 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-          <h2 id="ux-title" className="text-2xl font-bold md:text-3xl">{t('landing.uxTitle')}</h2>
-          <p className="mt-3 text-slate-700 dark:text-slate-200">{t('landing.uxDescription')}</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section id="wins" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Why EcoDiab AI Wins</h2>
+        <div id="impact-counters" className="mt-5 grid gap-4 md:grid-cols-3">
+          {counters.map((counter, idx) => (
+            <article key={counter.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <Gauge className="h-5 w-5 text-teal-700" />
+              <p className="mt-3 text-sm text-slate-700">{counter.label}</p>
+              <p className="mt-1 text-3xl font-bold text-slate-900">{counterValues[idx]}{counter.suffix}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-slate-50 text-slate-700">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Capability</th>
+                <th className="px-4 py-3 font-semibold">Manual Workflow</th>
+                <th className="px-4 py-3 font-semibold">Generic Telemedicine</th>
+                <th className="px-4 py-3 font-semibold">Standalone Device</th>
+                <th className="px-4 py-3 font-semibold">Fragmented EMR</th>
+                <th className="px-4 py-3 font-semibold text-teal-800">EcoDiab AI</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Predictive risk layer', 'Low', 'Partial', 'None', 'Low', 'Advanced'],
+                ['Therapy decision support', 'Manual', 'Basic', 'None', 'Limited', 'Clinician copilots'],
+                ['Offline-lite resilience', 'N/A', 'Low', 'Low', 'Low', 'Purpose-built'],
+                ['Cross-role orchestration', 'Low', 'Medium', 'Low', 'Medium', 'High'],
+              ].map((row) => (
+                <tr key={row[0]} className="border-t border-slate-200">
+                  {row.map((cell, i) => (
+                    <td key={cell} className={`px-4 py-3 ${i === row.length - 1 ? 'font-semibold text-teal-800' : 'text-slate-700'}`}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="business-model" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Business Model</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {[
+            ['Hospitals & clinics', 'Subscription per site + active patient tiering', Hospital],
+            ['Government / payer systems', 'Population contract + outcome-linked module pricing', BriefcaseMedical],
+            ['Clinician network add-ons', 'Premium decision-support and quality reporting tools', Stethoscope],
+          ].map(([title, copy, Icon]) => (
+            <article key={title as string} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <Icon className="h-5 w-5 text-teal-700" />
+              <h3 className="mt-3 font-semibold text-slate-900">{title as string}</h3>
+              <p className="mt-2 text-sm text-slate-700">{copy as string}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="go-to-market" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Go-to-Market</h2>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="font-semibold text-slate-900">Role-Based Value Proposition</h3>
+            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+              {[
+                ['Clinicians', 'Faster risk triage and safer titration suggestions', Stethoscope],
+                ['Hospitals', 'Reduced avoidable admissions and stronger protocol visibility', Building2],
+                ['Patients', 'Personalized coaching and continuity beyond visits', HeartPulse],
+                ['Payers', 'Population-level stratification and cost-control analytics', BarChart3],
+              ].map(([role, text, Icon]) => (
+                <div key={role as string} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <Icon className="h-4 w-4 text-teal-700" />
+                  <p className="mt-2 font-semibold text-slate-900">{role as string}</p>
+                  <p className="text-slate-700">{text as string}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="font-semibold text-slate-900">Interactive Patient Care Journey</h3>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {journeyStages.map((stage, idx) => (
+                <button
+                  key={stage.name}
+                  onClick={() => setActiveJourney(idx)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${activeJourney === idx ? 'border-teal-700 bg-teal-700 text-white' : 'border-slate-300 text-slate-700 hover:border-teal-300'}`}
+                >
+                  {stage.name}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">
+              <p className="font-semibold text-teal-900">{journeyStages[activeJourney].actor}</p>
+              <p className="mt-2 text-teal-900/90">{journeyStages[activeJourney].detail}</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="roadmap" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">12-Month Roadmap</h2>
+        <ol className="mt-5 grid gap-4 md:grid-cols-4">
+          {[
+            ['Q1', 'Pilot onboarding in flagship hospital clusters; baseline data harmonization.'],
+            ['Q2', 'Deploy predictive radar and glycemia forecast with clinician feedback loop.'],
+            ['Q3', 'Launch therapeutic copilots, payer dashboards, and multilingual coach expansion.'],
+            ['Q4', 'Scale to multi-site network with outcomes study and procurement readiness pack.'],
+          ].map(([quarter, detail]) => (
+            <li key={quarter as string} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-800">{quarter as string}</p>
+              <p className="mt-3 text-sm text-slate-700">{detail as string}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section id="team" className="mx-auto max-w-6xl px-4 py-10 reveal-on-scroll">
+        <h2 className="text-3xl font-bold text-slate-900">Team</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {[
+            ['Clinical AI Lead', 'Endocrinology + model governance', Activity],
+            ['Health Systems Lead', 'Hospital operations + interoperability', Users],
+            ['Product & Implementation Lead', 'Low-resource deployment + behavior design', GraduationCap],
+          ].map(([title, subtitle, Icon]) => (
+            <article key={title as string} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <Icon className="h-5 w-5 text-teal-700" />
+              <h3 className="mt-3 font-semibold text-slate-900">{title as string}</h3>
+              <p className="mt-2 text-sm text-slate-700">{subtitle as string}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="contact" className="mx-auto max-w-6xl px-4 pb-16 pt-10 reveal-on-scroll">
+        <div className="rounded-2xl border border-teal-200 bg-gradient-to-r from-teal-700 to-cyan-700 p-7 text-white shadow-md">
+          <h2 className="text-3xl font-bold">Contact / Demo Request</h2>
+          <p className="mt-3 max-w-3xl text-teal-50">Position EcoDiab AI as your chronic care orchestration backbone for hospitals, government programs, clinician teams, and community pathways.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="mailto:demo@ecodiab.ai" className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-teal-900">Request Demo</a>
+            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl border border-white/70 px-5 py-3 text-sm font-semibold text-white">Open Pilot Workspace <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          <div className="mt-6 grid gap-3 text-sm md:grid-cols-3">
             {[
-              { label: t('landing.uxVisual'), value: 'A+', icon: HeartPulse },
-              { label: t('landing.uxDiscoverability'), value: '92%', icon: ArrowRight },
-              { label: t('landing.uxTrust'), value: 'High', icon: ShieldCheck },
-              { label: t('landing.uxSustainability'), value: 'Strong', icon: Leaf },
-            ].map(({ label, value, icon: Icon }) => (
-              <div key={label} className="rounded-xl border border-slate-300 p-4 dark:border-slate-700">
-                <Icon className="h-5 w-5 text-emerald-700" aria-hidden="true" />
-                <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">{label}</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
+              ['Hospitals & Clinics', Hospital],
+              ['Government / Payers', BriefcaseMedical],
+              ['Patients & Caregivers', Languages],
+            ].map(([label, Icon]) => (
+              <div key={label as string} className="rounded-xl bg-white/10 p-3">
+                <Icon className="h-4 w-4" />
+                <p className="mt-2">{label as string}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="steps" className="mx-auto max-w-6xl px-4 pb-10" aria-labelledby="steps-title">
-        <h2 id="steps-title" className="text-2xl font-bold md:text-3xl">{t('landing.stepsTitle')}</h2>
-        <ol className="mt-4 grid gap-4 md:grid-cols-3">
-          {steps.map(({ icon: Icon, title, description }, idx) => (
-            <li key={title} className="list-none">
-              <article className="relative rounded-xl border border-slate-300 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
-                <span className="absolute right-4 top-4 text-xs font-bold text-slate-600 dark:text-slate-300" aria-label={`Step ${idx + 1}`}>
-                  0{idx + 1}
-                </span>
-                <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-                <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-                <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{description}</p>
-              </article>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-12" aria-labelledby="final-cta-title">
-        <div className="rounded-2xl border border-emerald-300 bg-gradient-to-r from-emerald-700 to-teal-700 p-6 text-white shadow-lg md:flex md:items-center md:justify-between">
-          <div>
-            <h3 id="final-cta-title" className="text-2xl font-bold">{t('landing.finalCtaTitle')}</h3>
-            <p className="mt-2 max-w-2xl text-emerald-100">{t('landing.finalCtaDescription')}</p>
-          </div>
-          <Link
-            to="/dashboard"
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-emerald-900 transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-700 md:mt-0"
-          >
-            {t('landing.finalCtaButton')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
-
-      <footer className="border-t border-slate-300 bg-white/90 dark:border-slate-700 dark:bg-slate-950/80" role="contentinfo">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <h4 className="text-lg font-bold text-emerald-800 dark:text-emerald-400">EcoDiab</h4>
-            <p className="mt-2 max-w-md text-sm text-slate-700 dark:text-slate-200">{t('landing.footerDescription')}</p>
-          </div>
-          <div>
-            <h5 className="font-semibold text-slate-900 dark:text-slate-100">{t('landing.footerNav')}</h5>
-            <ul className="mt-3 space-y-2 text-sm text-slate-700 dark:text-slate-200">
-              <li><a href="#features" className="rounded-sm hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700">{t('nav.features')}</a></li>
-              <li><a href="#impact" className="rounded-sm hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700">{t('nav.impact')}</a></li>
-              <li><a href="#steps" className="rounded-sm hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700">{t('nav.steps')}</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-semibold text-slate-900 dark:text-slate-100">{t('landing.footerContact')}</h5>
-            <address className="mt-3 space-y-2 text-sm not-italic text-slate-700 dark:text-slate-200">
-              <p>Email: care@ecodiab.health</p>
-              <p>Phone: +62 21 5550 1234</p>
-              <p>Jakarta, Indonesia</p>
-            </address>
-          </div>
-        </div>
-        <div className="border-t border-slate-300 py-4 text-center text-xs text-slate-700 dark:border-slate-700 dark:text-slate-300">
-          © {new Date().getFullYear()} EcoDiab. {t('landing.footerTagline')}
-        </div>
-      </footer>
+      <style>{`
+        .reveal-on-scroll { opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .5s ease; }
+        .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
+      `}</style>
     </MarketingLayout>
   );
 }
